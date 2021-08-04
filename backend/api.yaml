@@ -1,0 +1,138 @@
+swagger: "2.0"
+info:
+  description: "Mover api documention"
+  version: "1.0.0"
+  title: "Mover api"
+  contact:
+    email: "info@koodeyo.com"
+basePath: "/api/v1"
+tags:
+  - name: "Auth"
+    description: "User auth router"
+  - name: "Orders"
+    description: "User orders"
+schemes:
+  - "http"
+  - "https"
+paths:
+  /auth:
+    post:
+      tags:
+        - "Auth"
+      summary: "Post phone for varification"
+      description: ""
+      operationId: "Authenticate"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Auth data"
+          required: true
+          schema:
+            $ref: "#/definitions/AuthData"
+      responses:
+        "405":
+          description: "Invalid input"
+
+  /auth/verify/{phone}/{code}:
+    get:
+      tags:
+        - "Auth"
+      summary: "hit route and verify"
+      description: ""
+      operationId: "verify"
+      parameters:
+        - in: "path"
+          name: "phone"
+          description: "Phone number"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "code"
+          description: "6 digit code"
+          required: true
+          type: "string"
+      responses:
+        "405":
+          description: "Invalid input"
+
+  /orders:
+    post:
+      tags:
+        - "Orders"
+      summary: "Details of Users requests"
+      description: ""
+      operationId: "Make order"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Order data"
+          required: true
+          schema:
+            $ref: "#/definitions/orderData"
+      responses:
+        "405":
+          description: "Invalid input"
+security:
+  - ApiKeyAuth: []
+
+
+definitions:
+  AuthData:
+    type: "object"
+    properties:
+      fullName:
+        type: "string"
+      phone:
+        type: "string"
+  orderData:
+    type: "object"
+    properties:
+      user:
+        type: "string"
+      shiftNeed:
+        type: "string"
+      orderType:
+        type: "string"
+      pickUpAddress:
+        type: "object"
+        properties:
+          lat:
+            type: "number"
+          lng:
+            type: "number"
+      destinationAddress:
+        type: "object"
+        properties:
+          lat:
+            type: "number"
+          lng:
+            type: "number"
+
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+        
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: x-mover-token
+
+
+
+

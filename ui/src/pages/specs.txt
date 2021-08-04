@@ -1,0 +1,19 @@
+ 5secs banner
+ 
+ {
+    3 and above
+ map section
+ place auto complete
+ schedule movement
+ }
+
+ {
+     Delivery details
+     -reciept contant
+     -Delivery instructions
+     -pick up details pin point
+     - 
+ }
+
+ screenshots 
+ 
