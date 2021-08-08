@@ -1,12 +1,9 @@
+const notifyModel = require("../models/notify");
 const OrderModel = require("../models/orders");
+const user = require("../models/user");
 
-exports.ApproveOrder = function (req, res) {
-  let { orderId, userId } = req.params;
-  OrderModel.findOneAndUpdate(
-    { _id: orderId, user: userId },
-    { status: "Approved" },
-    (err, record) => {
-      res.json(record);
-    }
-  );
+exports.sendNotification = function () {
+  notifyModel.findOne({
+    _id,
+  });
 };

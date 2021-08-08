@@ -46,6 +46,24 @@ export const reducer = (state = initialState, action) => {
 
     case "logOut":
       return { ...state, token: "" };
+    // case "updateStatus":
+    //   return {
+    //     ...state,
+    //     moveOrders: state.moveOrders.map((order) =>
+    //       order._id === action.payload
+    //         ? { ...order, status: "APPROVED" }
+    //         : order
+    //     ),
+    //   };
+    case "updateStatus":
+      return {
+        ...state,
+        moveOrders: state.moveOrders.map((order) =>
+          order.id === action.payload.id
+            ? { ...order, status: action.payload.status }
+            : order
+        ),
+      };
 
     case "number/add": //naming convension name of slice followed by what its gon do
       return { ...state, number: state.number + 1 }; // what to do on dispatching action to store; ensure that u dont change the state directly; make a copy and modify that

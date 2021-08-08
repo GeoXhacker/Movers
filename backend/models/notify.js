@@ -5,12 +5,14 @@ const mongoose = require("mongoose");
 const NotifySchema = mongoose.Schema({
   user: { type: String, required: true },
   order: { type: String, required: true },
-  status: { type: String, default: "PENDING" },
+  status: { type: String, required: true },
   message: { type: String },
 });
 
 NotifySchema.post("save", async function (doc) {
   let user = await this.model("User").findById(doc.user);
+  console.log("middleware");
+  console.log(doc);
 
   sendSms(
     user.phone,
@@ -18,3 +20,5 @@ NotifySchema.post("save", async function (doc) {
     function (result) {}
   );
 });
+
+module.exports = mongoose.model("notifications", NotifySchema);

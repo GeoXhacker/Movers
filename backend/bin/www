@@ -33,6 +33,7 @@ const io = new Server(server, {
 });
 
 const uuid = require("uuid");
+const notify = require("../models/notify");
 
 io.engine.generateId = (req) => {
   return uuid.v4(); // must be unique across all Socket.IO servers
@@ -50,6 +51,14 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   if (socket.user) {
     console.log(`user connected`, socket.user);
+    notify.find({ user: socket.user.id }, (err, doc) => {
+      if (doc) {
+        console.log(doc);
+        // setInterval(() => {
+        io.emit("notifications", doc);
+        // }, 5000);
+      } else console.log("no notifications  for user");
+    });
   }
 });
 

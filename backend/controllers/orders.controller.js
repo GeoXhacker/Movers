@@ -5,6 +5,7 @@ const xtend = require("xtend");
 // const moment = require("moment");
 const moment = require("moment-timezone");
 const { latLonToPlace } = require("../utils/geoplugin");
+const notify = require("../models/notify");
 
 exports.makeOrder = async function (req, res, next) {
   // const getPlaceNames = new Promise((resolve, reject) => {
@@ -19,21 +20,25 @@ exports.makeOrder = async function (req, res, next) {
   // });
   // getPlacesNames.then();
 
-  const [destinationAddress, pickUpAddress] = await Promise.all([
-    latLonToPlace(
-      req.body.destinationAddress.lat,
-      req.body.destinationAddress.lng
-    ),
-    latLonToPlace(
-      req.body.destinationAddress.lat,
-      req.body.destinationAddress.lng
-    ),
-  ]);
+  // const [destinationAddress, pickUpAddress] = await Promise.all([
+  //   latLonToPlace(
+  //     req.body.destinationAddress.lat,
+  //     req.body.destinationAddress.lng
+  //   ),
+  //   latLonToPlace(
+  //     req.body.destinationAddress.lat,
+  //     req.body.destinationAddress.lng
+  //   ),
+  // ]);
 
   const orderData = xtend(req.body, {
     user: req.user.id,
-    destinationAddressName: destinationAddress.geoplugin_place,
-    pickUpAddressName: pickUpAddress.geoplugin_place,
+    destinationAddressName:
+      // destinationAddress.geoplugin_place
+      "makindye",
+    pickUpAddressName:
+      // pickUpAddress.geoplugin_place
+      "nansana",
   });
 
   const newOrder = new OrderModel(orderData);
@@ -72,20 +77,40 @@ exports.getOrders = async function (req, res) {
   res.json(orders);
 };
 
-exports.confirmOrder = async function (req, res, next) {
-  let order = await OrderModel.findByIdAndUpdate(req.params.id, {
-    status: "APPROVED",
-    confirmedAt: new Date(),
-  });
+exports.confirmOrder = function (req, res, next) {
+  OrderModel.findByIdAndUpdate(
+    req.params.id,
 
-  let notification = await NotifyModel.create({
-    user: order.user,
-    order: order._id,
-  });
-
-  console.log("order", order);
-  console.log(order.user);
-  res.json(order);
+    {
+      status: "APPROVED",
+      confirmedAt: new Date(),
+    },
+    (err, order) => {
+      if (order) {
+        notify.findOne({ order: order._id }, (err, doc) => {
+          if (doc) {
+            console.log(doc);
+          } else {
+            new NotifyModel({
+              user: order.user,
+              order: order._id,
+              status: "APPROVED",
+            })
+              .save()
+              .catch((e) => {
+                console.log("failed to create notification in db");
+              });
+            res.json({
+              order: order._id,
+              user: order.user,
+              status: order.status,
+              confirmedAt: order.confirmedAt,
+            });
+          }
+        });
+      }
+    }
+  );
 };
 
 exports.getOrder = async function (req, res, next) {

@@ -10,7 +10,7 @@ import {
   f7,
 } from "framework7-react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, selectAPI_URL } from "../js/store_redux";
+import { selectUser, selectAPI_URL, selectMoveOrders } from "../js/store_redux";
 
 // let user = JSON.parse(localStorage.getItem("user"));
 function name(params) {
@@ -22,15 +22,18 @@ function name(params) {
 function ProfilePage() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const order = useSelector(selectMoveOrders);
 
   const API_URL = useSelector(selectAPI_URL);
 
   const put = () => {
     f7.request({
       method: "PUT",
-      url: `${API_URL}/orders/610a92583d587559294a4482`,
+      url: `${API_URL}/orders/${order[8].id}`,
     }).then((res) => {
-      console.log(res.data);
+      // console.log(res.data);
+      // dispatch({ type: "updateStatus", payload: res.data.order });
+      // f7.dialog.alert("Your order has been approved");
     });
     console.log("put");
   };

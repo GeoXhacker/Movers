@@ -9,6 +9,11 @@ export default {
       },
     }));
 
+    return socket;
+    // socket.on("notifications", (doc) => {
+    //   console.log(doc);
+
+    // });
     //f7.socket = socket
 
     // socket.on("connect", function () {

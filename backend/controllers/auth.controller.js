@@ -107,7 +107,7 @@ exports.verify = async function (req, res, next) {
     res.json({
       message: "Authentication succeeded",
       token,
-      userInfo: data,
+      userInfo: { ...data, id: user._id },
     });
   }
 

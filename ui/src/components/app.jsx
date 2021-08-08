@@ -18,11 +18,13 @@ import cordovaApp from "../js/cordova-app";
 import routes from "../js/routes";
 import store from "../js/store";
 import socket from "../js/socket";
-import { useSelector } from "react-redux";
-import { selectToken } from "../js/store_redux";
+import { useSelector, useDispatch } from "react-redux";
+import { selectMoveOrders, selectToken } from "../js/store_redux";
 
 const MyApp = () => {
   const token = useSelector(selectToken);
+  const moveOrders = useSelector(selectMoveOrders);
+  const dispatch = useDispatch();
   // Login screen demo data
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -65,13 +67,66 @@ const MyApp = () => {
     }
 
     if (token) {
-      socket.connect(f7, token);
+      let conn = socket.connect(f7, token);
+      const objectsEqual = (o1, o2) =>
+        typeof o1 === "object" && Object.keys(o1).length > 0
+          ? Object.keys(o1).length === Object.keys(o2).length &&
+            Object.keys(o1).every((p) => objectsEqual(o1[p], o2[p]))
+          : o1 === o2;
+
+      const arraysEqual = (a1, a2) =>
+        a1.length === a2.length &&
+        a1.every((o, idx) => objectsEqual(o, a2[idx]));
+
+      conn.on("notifications", (doc) => {
+        // console.log(moveOrders);
+        console.log("update", doc);
+        let doc2 = doc.map((e) => e);
+        console.log(doc2);
+
+       
+
+        // let intersection =
+
+        // moveOrders.filter((order) =>
+        //   doc.some((update) => {
+        //     if (order.id === update.order) {
+        //       console.log(order, update);
+        //       console.log("starting dispatch");
+
+        //       // dispatch({
+        //       //   type: "updateStatus",
+        //       //   payload: {
+        //       //     id: update.id,
+        //       //     status: update.status,
+        //       //   },
+        //       // });
+        //       // console.log("dispatched");
+        //     } else console.log("no updates for", order);
+        //   })
+        // );
+        // console.log("intersection", intersection);
+
+        // for (let i = 0; i < doc.length; i++) {
+        //   const update = doc[i];
+        //   console.log(update);
+        //   const orderTobeUpdated = moveOrders.find((e) => e.id === update.order);
+        //   if (orderTobeUpdated) {
+        //     console.log("found", orderTobeUpdated);
+        //     dispatch({
+        //       type: "updateStatus",
+        //       payload: {
+        //         id: update.order,
+        //         status: update.status,
+        //       },
+        //     });
+        //     console.log("status updated");
+        //   }
+        // }
+      });
     }
 
-    // setTimeout(() => {
-    //   f7.socket.emit("token", "00888888");
-    // }, 9000);
-    // MqttClient.connect(f7);
+    // f7.sockect.on('notifications', ())
 
     // Call F7 APIs here
   });

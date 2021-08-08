@@ -34,7 +34,7 @@ export default function movePopUp({ children }) {
 
   function submitOrder() {
     //  console.log('done')
-    console.log(store.getState().token);
+    // console.log(store.getState().token);
     let order = {
       moveType,
       pickUpAddress: { lat: "0.2924404", lng: "32.571751" },

@@ -1,4 +1,5 @@
 import {
+  f7,
   BlockTitle,
   Card,
   CardContent,
@@ -12,6 +13,8 @@ import {
 import React from "react";
 import { useSelector } from "react-redux";
 import { selectDeliveryOrders, selectMoveOrders } from "../js/store_redux";
+
+// let socket = io("http://localhost:3000");
 
 const HistoryPage = () => {
   let moveOrders = useSelector(selectMoveOrders);
@@ -39,7 +42,9 @@ const HistoryPage = () => {
               title={order.moveType || order.what}
               after={order.status}
               subtitle={`${order.pickUpAddressName} to ${order.destinationAddressName}`}
-              text={`${order.shiftNeed}    ${order.scheduleDate}`}
+              text={`${order.shiftNeed || "Date"}    ${
+                order.scheduleDate || order.date
+              }`}
               key={index}
             >
               <Link slot="media">
