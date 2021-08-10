@@ -19,11 +19,12 @@ import routes from "../js/routes";
 import store from "../js/store";
 import socket from "../js/socket";
 import { useSelector, useDispatch } from "react-redux";
-import { selectMoveOrders, selectToken } from "../js/store_redux";
+import { selectSocket, selectMoveOrders, selectToken } from "../js/store_redux";
 
 const MyApp = () => {
   const token = useSelector(selectToken);
   const moveOrders = useSelector(selectMoveOrders);
+  const socketCount = useSelector(selectSocket);
   const dispatch = useDispatch();
   // Login screen demo data
   const [username, setUsername] = useState("");
@@ -78,51 +79,87 @@ const MyApp = () => {
         a1.length === a2.length &&
         a1.every((o, idx) => objectsEqual(o, a2[idx]));
 
+      conn.on("reconnect", (hey) => {
+        conn.emit("reconnected", "i reconnected");
+      });
+
       conn.on("notifications", (doc) => {
         // console.log(moveOrders);
         console.log("update", doc);
-        let doc2 = doc.map((e) => e);
-        console.log(doc2);
+        // let doc2 = doc.map((e) => e);
+        // console.log(doc2);
 
-       
+        if ((doc.length = 1)) {
+          localStorage.setItem("doc", JSON.stringify(doc));
+          moveOrders.filter((order) =>
+            doc.some((update) => {
+              if (order.id === update.order) {
+                console.log(order, update);
+                console.log("starting dispatch");
+
+                // dispatch({
+                //   type: "updateStatus",
+                //   payload: {
+                //     id: update.order,
+                //     status: update.status,
+                //   },
+                // });
+                console.log("dispatched");
+                conn.emit("checkDb", doc);
+              }
+            })
+          );
+        } else if (
+          doc.length == JSON.parse(localStorage.getItem("doc")).length
+        ) {
+          moveOrders.filter((order) =>
+            doc.some((update) => {
+              if (order.id === update.order) {
+                console.log(order, update);
+                console.log("starting dispatch");
+
+                // dispatch({
+                //   type: "updateStatus",
+                //   payload: {
+                //     id: update.order,
+                //     status: update.status,
+                //   },
+                // });
+                console.log("dispatched");
+                // conn.emit("checkDb", doc);
+              }
+            })
+          );
+        }
 
         // let intersection =
+        // if (socketCount >= 0 && pendingNotification.get("doc") !== doc) {
+        //   let pendingNotification = new Map();
+        //   pendingNotification.set("doc", doc);
+        //   // return console.log(pendingNotification.get("doc"), "pending");
+        //   if (doc) {
+        //     moveOrders.filter((order) =>
+        //       doc.some((update) => {
+        //         if (order.id === update.order) {
+        //           console.log(order, update);
+        //           console.log("starting dispatch");
 
-        // moveOrders.filter((order) =>
-        //   doc.some((update) => {
-        //     if (order.id === update.order) {
-        //       console.log(order, update);
-        //       console.log("starting dispatch");
-
-        //       // dispatch({
-        //       //   type: "updateStatus",
-        //       //   payload: {
-        //       //     id: update.id,
-        //       //     status: update.status,
-        //       //   },
-        //       // });
-        //       // console.log("dispatched");
-        //     } else console.log("no updates for", order);
-        //   })
-        // );
-        // console.log("intersection", intersection);
-
-        // for (let i = 0; i < doc.length; i++) {
-        //   const update = doc[i];
-        //   console.log(update);
-        //   const orderTobeUpdated = moveOrders.find((e) => e.id === update.order);
-        //   if (orderTobeUpdated) {
-        //     console.log("found", orderTobeUpdated);
-        //     dispatch({
-        //       type: "updateStatus",
-        //       payload: {
-        //         id: update.order,
-        //         status: update.status,
-        //       },
-        //     });
-        //     console.log("status updated");
+        //           // dispatch({
+        //           //   type: "updateStatus",
+        //           //   payload: {
+        //           //     id: update.order,
+        //           //     status: update.status,
+        //           //   },
+        //           // });
+        //           console.log("dispatched");
+        //           conn.emit("checkDb", doc);
+        //         }
+        //       })
+        //     );
         //   }
         // }
+
+        // console.log("intersection", intersection);
       });
     }
 
@@ -137,9 +174,17 @@ const MyApp = () => {
       <Panel left cover>
         <View>
           <Page>
-            <Navbar title="Left Panel" />
+            <Navbar title="About us" />
             <List>
-              <ListItem>this is </ListItem>
+              <ListItem>
+                We are a domestic moving company. Our services also include
+                package delivery and long-distance relocations. We cover several
+                cities of our nation Uganda. If you’re in need of a moving
+                quote, please feel free to contact us anytime. We can schedule
+                an appointment to do an in-home walkthrough or virtual survey.
+                Our goal is that you’re pleased with the outcome of your move.
+                Thank you for choosing us.
+              </ListItem>
             </List>
           </Page>
         </View>

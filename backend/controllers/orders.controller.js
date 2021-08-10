@@ -1,6 +1,7 @@
 const OrderModel = require("../models/orders");
 const UserModel = require("../models/user");
 const NotifyModel = require("../models/notify");
+const DeliveryOrderModel = require("../models/delivery");
 const xtend = require("xtend");
 // const moment = require("moment");
 const moment = require("moment-timezone");
@@ -100,12 +101,12 @@ exports.confirmOrder = function (req, res, next) {
               .catch((e) => {
                 console.log("failed to create notification in db");
               });
-            res.json({
-              order: order._id,
-              user: order.user,
-              status: order.status,
-              confirmedAt: order.confirmedAt,
-            });
+            // res.json({
+            //   order: order._id,
+            //   user: order.user,
+            //   status: order.status,
+            //   confirmedAt: order.confirmedAt,
+            // });
           }
         });
       }
@@ -121,4 +122,12 @@ exports.getOrder = async function (req, res, next) {
 exports.deleteOrder = async function (req, res, next) {
   let order = await OrderModel.findByIdAndDelete(req.params.id);
   res.json(order);
+};
+
+exports.getOrders = async function (req, res) {
+  let orders = await OrderModel.find(req.query).populate({
+    path: "user",
+    select: "username phone",
+  });
+  res.json(orders);
 };

@@ -51,15 +51,30 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   if (socket.user) {
     console.log(`user connected`, socket.user);
+
+    // io.on("user-reconnected", function (username) {
+    //   console.log(username + " just reconnected");
+    // });
+
     notify.find({ user: socket.user.id }, (err, doc) => {
       if (doc) {
         console.log(doc);
+        // io.on("checkDb", async (clientDoc) => {
+        //   doc === clientDoc
+        //     ? console.log("upto date with client")
+        //     : io.emit("notifications", doc);
+        // });
         // setInterval(() => {
         io.emit("notifications", doc);
+
         // }, 5000);
       } else console.log("no notifications  for user");
     });
   }
+});
+
+io.on("reconnected", () => {
+  console.log("i reconnected");
 });
 
 setTimeout(async () => {

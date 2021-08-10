@@ -12,6 +12,6 @@ router
   .route("/:id")
   .get(deliveryController.getOrder)
   .delete(deliveryController.deleteOrder)
-  .put(deliveryController.confirmOrder);
+  .put(deliveryController.confirmDeliveryOrder);
 
 module.exports = router;

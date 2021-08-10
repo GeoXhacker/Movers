@@ -29,7 +29,7 @@ function ProfilePage() {
   const put = () => {
     f7.request({
       method: "PUT",
-      url: `${API_URL}/orders/${order[8].id}`,
+      url: `${API_URL}/orders/${order[0].id}`,
     }).then((res) => {
       // console.log(res.data);
       // dispatch({ type: "updateStatus", payload: res.data.order });

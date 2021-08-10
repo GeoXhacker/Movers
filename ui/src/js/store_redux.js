@@ -14,6 +14,7 @@ export const initialState = {
   user: {},
   n: 1,
   test: 30,
+  socket: 0,
 };
 // 3.create a reducer function; that is gonna make the logic behind user actions
 export const reducer = (state = initialState, action) => {
@@ -63,6 +64,7 @@ export const reducer = (state = initialState, action) => {
             ? { ...order, status: action.payload.status }
             : order
         ),
+        socket: state.socket++,
       };
 
     case "number/add": //naming convension name of slice followed by what its gon do
@@ -93,6 +95,9 @@ export const selectNumber = (state) => {
   return state.number;
 };
 
+export const selectSocket = (state) => {
+  return state.socket;
+};
 export const selectMoveOrders = (state) => {
   return state.moveOrders;
 };

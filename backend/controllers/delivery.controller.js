@@ -65,26 +65,40 @@ exports.getOrders = async function (req, res) {
   res.json(orders);
 };
 
-exports.confirmOrder = async function (req, res, next) {
-  let order = await DeliveryModel.findByIdAndUpdate(req.params.id, {
-    status: "APPROVED",
-    confirmedAt: new Date(),
-  });
+exports.confirmDeliveryOrder = function (req, res, next) {
+  DeliveryOrderModel.findByIdAndUpdate(
+    req.params.id,
 
-  let notification = await NotifyModel.create({
-    user: order.user,
-    order: order._id,
-    status: order.status,
-  }).catch((e) => {
-    console.log("failed to create notification in db");
-  });
-
-  res.json({
-    order: order._id,
-    user: order.user,
-    status: order.status,
-    confirmedAt: order.confirmedAt,
-  });
+    {
+      status: "APPROVED",
+      confirmedAt: new Date(),
+    },
+    (err, order) => {
+      if (order) {
+        notify.findOne({ order: order._id }, (err, doc) => {
+          if (doc) {
+            console.log(doc);
+          } else {
+            new NotifyModel({
+              user: order.user,
+              order: order._id,
+              status: "APPROVED",
+            })
+              .save()
+              .catch((e) => {
+                console.log("failed to create notification in db");
+              });
+            // res.json({
+            //   order: order._id,
+            //   user: order.user,
+            //   status: order.status,
+            //   confirmedAt: order.confirmedAt,
+            // });
+          }
+        });
+      }
+    }
+  );
 };
 
 exports.getOrder = async function (req, res, next) {

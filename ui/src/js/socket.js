@@ -8,7 +8,7 @@ export default {
         token: token,
       },
     }));
-
+    // socket.reconnect()
     return socket;
     // socket.on("notifications", (doc) => {
     //   console.log(doc);
