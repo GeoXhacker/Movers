@@ -1,4 +1,5 @@
 import {
+  Button,
   f7,
   Fab,
   Icon,
@@ -11,13 +12,20 @@ import {
   Page,
   Popup,
 } from "framework7-react";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 // import store from "../js/store";
 // import Map from "./map";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAPI_URL, selectToken } from "../js/store_redux";
-import { submit } from "dom7";
 import { store } from "../js/store_redux";
+// var mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
+
+// mapboxgl.accessToken =
+//   "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
+// var map = new mapboxgl.Map({
+//   container: "map",
+//   style: "mapbox://styles/mapbox/streets-v11",
+// });
 
 export default function movePopUp({ children }) {
   const [popupOpened, setPopupOpened] = useState(false);
@@ -27,17 +35,65 @@ export default function movePopUp({ children }) {
   const [destinationAddress, setDestination] = useState("");
   const [shiftNeed, setShiftNeed] = useState("");
   const [scheduleDate, setScheduleDate] = useState("");
+  const [geoloclat, setGeoLocLat] = useState("");
+  const [geoloclng, setGeoLocLng] = useState("");
 
   const dispatch = useDispatch();
   const API_URL = useSelector(selectAPI_URL);
   const token = useSelector(selectToken);
+
+  const getLoc = () => {
+    if (window.navigator.geolocation) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      };
+      function success(pos) {
+        const crd = pos.coords;
+        setGeoLocLat(crd.latitude);
+        setGeoLocLng(crd.longitude);
+
+        // console.log("Your current position is:");
+        // console.log(`Latitude : ${crd.latitude}`);
+        // console.log(`Longitude: ${crd.longitude}`);
+        // console.log(`More or less ${crd.accuracy} meters.`);
+      }
+
+      function errors(err) {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+      }
+      window.navigator.permissions
+        .query({ name: "geolocation" })
+        .then(function (result) {
+          if (result.state === "granted") {
+            console.log(result.state);
+            // If granted then you can directly call your function here
+            window.navigator.geolocation.getCurrentPosition(success);
+          } else if (result.state === "prompt") {
+            window.navigator.geolocation.getCurrentPosition(
+              success,
+              errors,
+              options
+            );
+          } else if (result.state === "denied") {
+            // If denied then you have to show instructions to enable location
+          }
+          result.onchange = function () {
+            console.log(result.state);
+          };
+        });
+    } else {
+      alert("Sorry Not available!");
+    }
+  };
 
   function submitOrder() {
     //  console.log('done')
     // console.log(store.getState().token);
     let order = {
       moveType,
-      pickUpAddress: { lat: "0.2924404", lng: "32.571751" },
+      pickUpAddress: { lat: geoloclat, lng: geoloclng },
       destinationAddress: { lat: "0.2890523", lng: "32.5672294" },
       shiftNeed,
       scheduleDate,
@@ -120,6 +176,10 @@ export default function movePopUp({ children }) {
                 setPickUp(e.target.value);
               }}
             ></ListInput>
+            <ListItem>
+              <p>{`${geoloclat}, ${geoloclng}`}</p>
+              <Button onClick={getLoc}>get location</Button>
+            </ListItem>
 
             <ListInput
               label="To"
@@ -184,6 +244,7 @@ export default function movePopUp({ children }) {
             </ListItem>
           </List>
           {/* <Map /> */}
+          <div id="map"></div>
 
           <Fab
             position="center-bottom"

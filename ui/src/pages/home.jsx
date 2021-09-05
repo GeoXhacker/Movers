@@ -12,11 +12,22 @@ import {
   Page,
   Row,
 } from "framework7-react";
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Swiper from "react-id-swiper";
 import { useDispatch } from "react-redux";
 import MovePopup from "../components/move_popup";
 import PackagePopup from "../components/package_popup";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+// import "./map.css";
+
+// import ReactMapboxGl, { Layer, Feature, Marker } from "react-mapbox-gl";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+// var mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
+// var MapboxDirections = require("@mapbox/mapbox-gl-directions");
+
+mapboxgl.accessToken =
+  "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
 
 const params = {
   spaceBetween: 30,
@@ -34,8 +45,69 @@ const params = {
   //   prevEl: '.swiper-button-prev'
   // }
 };
+// const Map = ReactMapboxGl({
+//   accessToken:
+//     "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ",
+// });
 
 const HomePage = ({ f7router }) => {
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const [lng, setLng] = useState(-70.9);
+  const [lat, setLat] = useState(42.35);
+  const [zoom, setZoom] = useState(9);
+
+  useEffect(() => {
+    console.log(map, "cur");
+    if (map.current) return; // initialize map only once
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [32.5825, 0.3476],
+      zoom: zoom,
+    });
+
+    const marker1 = new mapboxgl.Marker({
+      // color: "#FFFFFF",
+      // draggable: true,
+    })
+      .setLngLat([32.5675, 0.3335])
+      .addTo(map.current);
+
+    const marker2 = new mapboxgl.Marker({
+      // color: "#FFFFFF",
+      // draggable: true,
+    })
+      .setLngLat([32.5645, 0.3665])
+      .addTo(map.current);
+
+    map.current.addControl(
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        autocomplete: true,
+        countries: "ug",
+      })
+    );
+  });
+
+  // var directions = new MapboxDirections({
+  //   accessToken: "YOUR-MAPBOX-ACCESS-TOKEN",
+  //   unit: "metric",
+  //   profile: "mapbox/driving",
+  // });
+
+  // map.current.addControl(directions, "top-left");
+
+  useEffect(() => {
+    if (!map.current) return; // wait for map to initialize
+    map.current.on("move", () => {
+      setLng(map.current.getCenter().lng.toFixed(4));
+      setLat(map.current.getCenter().lat.toFixed(4));
+      setZoom(map.current.getZoom().toFixed(2));
+    });
+  });
+
   let dispatch = useDispatch();
   function logOut(f7router) {
     // localStorage.setItem("x-mover-token", "");
@@ -144,6 +216,47 @@ const HomePage = ({ f7router }) => {
           </Col>
         </Row>
       </Block>
+      {/* <Block>
+        
+        <Map
+          style="mapbox://styles/mapbox/streets-v9"
+          containerStyle={{
+            height: "50vh",
+            width: "100vw",
+          }}
+          center={[32.5825, 0.3476]}
+          zoom={[15]}
+        >
+          <Layer
+            // type="symbol"
+            // id="marker"
+            // layout={{ "icon-image": "marker-15" }}
+
+            type="circle"
+            id="marker"
+            paint={{
+              "circle-color": "#ff5200",
+              "circle-stroke-width": 1,
+              "circle-stroke-color": "#fff",
+              "circle-stroke-opacity": 1,
+            }}  
+          >
+            <Feature coordinates={[32.5675, 0.3335]} />
+          </Layer>
+           <Marker coordinates={[32.5675, 0.3335]}></Marker> 
+        </Map>
+      </Block> */}
+
+      <div>
+        <div className="sidebar">
+          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        </div>
+        <div
+          ref={mapContainer}
+          className="map-container"
+          style={{ height: 400 }}
+        />
+      </div>
     </Page>
   );
 };

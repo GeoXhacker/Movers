@@ -4,6 +4,11 @@ let DeliveryOrder = mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     what: { type: String, required: true },
+    type: {
+      type: String,
+      required: true,
+      default: "Delivery",
+    },
     instructions: { type: String, required: true },
     recipient: { type: Number, required: true },
     pickUpAddress: {
@@ -39,4 +44,4 @@ let DeliveryOrder = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("DeliveyOrder", DeliveryOrder);
+module.exports = mongoose.model("DeliveryOrder", DeliveryOrder);

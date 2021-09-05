@@ -14,7 +14,7 @@ const { SECRET_KEY } = require("../constants");
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || "3000");
+var port = normalizePort(process.env.PORT || "5000");
 app.set("port", port);
 
 /**
@@ -32,6 +32,7 @@ const io = new Server(server, {
   },
 });
 
+module.exports = { io };
 const uuid = require("uuid");
 const notify = require("../models/notify");
 
@@ -52,35 +53,38 @@ io.on("connection", (socket) => {
   if (socket.user) {
     console.log(`user connected`, socket.user);
 
-    // io.on("user-reconnected", function (username) {
-    //   console.log(username + " just reconnected");
-    // });
-
     notify.find({ user: socket.user.id }, (err, doc) => {
       if (doc) {
-        console.log(doc);
-        // io.on("checkDb", async (clientDoc) => {
-        //   doc === clientDoc
-        //     ? console.log("upto date with client")
-        //     : io.emit("notifications", doc);
+        // return io.on("checkDoc", (socket) => {
+        //   console.log(socket, "checked");
         // });
-        // setInterval(() => {
+        console.log("user notifications", doc);
+
+        // io.on("checkDoc", (uiDoc) => {
+        //   console.log(uiDoc);
+        //   console.log("checking......dfjjffjjffj");
+        //   if (uiDoc) {
+        //     if (uiDoc.length < doc.length) {
+        //       io.emit("notifications", doc);
+        //     } else console.log("notifications upto date");
+        //   } else {
+
+        // io.on("db", (e) => {
+        //   console.log("front", e);
+        // });
         io.emit("notifications", doc);
 
-        // }, 5000);
+        //   }
+        // });
       } else console.log("no notifications  for user");
     });
   }
 });
 
-io.on("reconnected", () => {
-  console.log("i reconnected");
-});
-
 setTimeout(async () => {
   const ids = await io.allSockets();
   console.log("sockets", ids);
-}, 9000);
+}, 5000);
 
 /**
  * Listen on provided port, on all network interfaces.

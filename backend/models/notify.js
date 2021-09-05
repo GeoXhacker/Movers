@@ -2,6 +2,7 @@ const sendSms = require("../utils/softphone");
 const UserModel = require("../models/user");
 
 const mongoose = require("mongoose");
+// const io = require("../bin/www");
 const NotifySchema = mongoose.Schema({
   user: { type: String, required: true },
   order: { type: String, required: true },
@@ -13,6 +14,7 @@ NotifySchema.post("save", async function (doc) {
   let user = await this.model("User").findById(doc.user);
   console.log("middleware");
   console.log(doc);
+  // io.emit("notification", doc);
 
   sendSms(
     user.phone,

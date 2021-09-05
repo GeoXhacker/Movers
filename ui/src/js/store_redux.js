@@ -64,7 +64,7 @@ export const reducer = (state = initialState, action) => {
             ? { ...order, status: action.payload.status }
             : order
         ),
-        socket: state.socket++,
+        socket: state.socket + 1,
       };
 
     case "number/add": //naming convension name of slice followed by what its gon do

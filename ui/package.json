@@ -25,6 +25,9 @@
     "Samsung >= 5"
   ],
   "dependencies": {
+    "@geocoder-free/google": "^0.2.9-alpha.0",
+    "@mapbox/mapbox-gl-directions": "^4.1.0",
+    "@mapbox/mapbox-gl-geocoder": "^4.7.3",
     "@material-ui/core": "^4.12.1",
     "buffer": "^5.7.1",
     "dom7": "^3.0.0",
@@ -32,6 +35,7 @@
     "framework7-icons": "^4.0.2",
     "framework7-react": "^6.0.21",
     "google-maps": "^4.3.3",
+    "mapbox-gl": "^2.4.1",
     "moment": "^2.29.1",
     "mqemitter": "^4.4.1",
     "mqtt": "^4.2.8",
@@ -40,6 +44,8 @@
     "react-datetime-picker": "^3.3.0",
     "react-dom": "^17.0.2",
     "react-id-swiper": "^4.0.0",
+    "react-mapbox-gl": "^5.1.1",
+    "react-mapbox-gl-geocoder": "^1.1.0",
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "redux-persist": "^6.0.0",

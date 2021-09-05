@@ -17,6 +17,7 @@ let User = mongoose.Schema(
     toObject: {
       virtuals: true,
     },
+    timeStamps: true,
   }
 );
 

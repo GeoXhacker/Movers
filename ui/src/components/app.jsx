@@ -13,13 +13,17 @@ import {
   Views,
 } from "framework7-react";
 import { getDevice } from "framework7/lite-bundle";
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import cordovaApp from "../js/cordova-app";
 import routes from "../js/routes";
 import store from "../js/store";
 import socket from "../js/socket";
 import { useSelector, useDispatch } from "react-redux";
 import { selectSocket, selectMoveOrders, selectToken } from "../js/store_redux";
+// import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+
+// mapboxgl.accessToken =
+//   "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
 
 const MyApp = () => {
   const token = useSelector(selectToken);
@@ -30,7 +34,37 @@ const MyApp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const device = getDevice();
+
+  useEffect(() => {
+    if (token) {
+      let conn = socket.connect(f7, token);
+      conn.on("notifications", (doc) => {
+        console.log("update", doc);
+
+        moveOrders.filter((order) =>
+          doc.some((update) => {
+            if (order.id === update.order) {
+              console.log(order, update);
+              console.log("starting dispatch");
+
+              dispatch({
+                type: "updateStatus",
+                payload: {
+                  id: update.order,
+                  status: update.status,
+                },
+              });
+              console.log("dispatched");
+              // conn.emit("checkDb", doc);
+            }
+          })
+        );
+      });
+    }
+  }, []);
+
   // Framework7 Parameters
+
   const f7params = {
     name: "Movers", // App name
     theme: "auto", // Automatic theme detection
@@ -67,102 +101,31 @@ const MyApp = () => {
       cordovaApp.init(f7);
     }
 
-    if (token) {
-      let conn = socket.connect(f7, token);
-      const objectsEqual = (o1, o2) =>
-        typeof o1 === "object" && Object.keys(o1).length > 0
-          ? Object.keys(o1).length === Object.keys(o2).length &&
-            Object.keys(o1).every((p) => objectsEqual(o1[p], o2[p]))
-          : o1 === o2;
+    // if (token) {
+    //   let conn = socket.connect(f7, token);
+    //   conn.on("notifications", (doc) => {
+    //     console.log("update", doc);
 
-      const arraysEqual = (a1, a2) =>
-        a1.length === a2.length &&
-        a1.every((o, idx) => objectsEqual(o, a2[idx]));
+    //     moveOrders.filter((order) =>
+    //       doc.some((update) => {
+    //         if (order.id === update.order) {
+    //           console.log(order, update);
+    //           console.log("starting dispatch");
 
-      conn.on("reconnect", (hey) => {
-        conn.emit("reconnected", "i reconnected");
-      });
-
-      conn.on("notifications", (doc) => {
-        // console.log(moveOrders);
-        console.log("update", doc);
-        // let doc2 = doc.map((e) => e);
-        // console.log(doc2);
-
-        if ((doc.length = 1)) {
-          localStorage.setItem("doc", JSON.stringify(doc));
-          moveOrders.filter((order) =>
-            doc.some((update) => {
-              if (order.id === update.order) {
-                console.log(order, update);
-                console.log("starting dispatch");
-
-                // dispatch({
-                //   type: "updateStatus",
-                //   payload: {
-                //     id: update.order,
-                //     status: update.status,
-                //   },
-                // });
-                console.log("dispatched");
-                conn.emit("checkDb", doc);
-              }
-            })
-          );
-        } else if (
-          doc.length == JSON.parse(localStorage.getItem("doc")).length
-        ) {
-          moveOrders.filter((order) =>
-            doc.some((update) => {
-              if (order.id === update.order) {
-                console.log(order, update);
-                console.log("starting dispatch");
-
-                // dispatch({
-                //   type: "updateStatus",
-                //   payload: {
-                //     id: update.order,
-                //     status: update.status,
-                //   },
-                // });
-                console.log("dispatched");
-                // conn.emit("checkDb", doc);
-              }
-            })
-          );
-        }
-
-        // let intersection =
-        // if (socketCount >= 0 && pendingNotification.get("doc") !== doc) {
-        //   let pendingNotification = new Map();
-        //   pendingNotification.set("doc", doc);
-        //   // return console.log(pendingNotification.get("doc"), "pending");
-        //   if (doc) {
-        //     moveOrders.filter((order) =>
-        //       doc.some((update) => {
-        //         if (order.id === update.order) {
-        //           console.log(order, update);
-        //           console.log("starting dispatch");
-
-        //           // dispatch({
-        //           //   type: "updateStatus",
-        //           //   payload: {
-        //           //     id: update.order,
-        //           //     status: update.status,
-        //           //   },
-        //           // });
-        //           console.log("dispatched");
-        //           conn.emit("checkDb", doc);
-        //         }
-        //       })
-        //     );
-        //   }
-        // }
-
-        // console.log("intersection", intersection);
-      });
-    }
-
+    //           dispatch({
+    //             type: "updateStatus",
+    //             payload: {
+    //               id: update.order,
+    //               status: update.status,
+    //             },
+    //           });
+    //           console.log("dispatched");
+    //           // conn.emit("checkDb", doc);
+    //         }
+    //       })
+    //     );
+    //   });
+    // }
     // f7.sockect.on('notifications', ())
 
     // Call F7 APIs here

@@ -7,6 +7,11 @@ let Order = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+      default: "Moving",
+    },
     moveType: {
       type: String,
       required: true,

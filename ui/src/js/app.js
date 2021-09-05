@@ -17,6 +17,10 @@ import "../css/icons.css";
 // import { store } from "./store_redux";
 import { persistor, store } from "./store_redux";
 
+import "mapbox-gl/dist/mapbox-gl.css";
+
+// import "../pages/map.css";
+
 // Init F7 React Plugin
 Framework7.use(Framework7React);
 

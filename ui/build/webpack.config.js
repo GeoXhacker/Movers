@@ -20,9 +20,11 @@ const isCordova = target === "cordova";
 module.exports = {
   mode: env,
   target: env === "development" ? "web" : "browserslist",
+  // target: "node",
   entry: {
     app: "./src/js/app.js",
   },
+
   output: {
     path: resolvePath(isCordova ? "cordova/www" : "www"),
     filename: "js/[name].js",
@@ -36,6 +38,9 @@ module.exports = {
     alias: {
       "@": resolvePath("src"),
     },
+    fallback: {
+      fs: false,
+    },
   },
   devtool: env === "production" ? "source-map" : "eval",
   devServer: {
@@ -48,7 +53,7 @@ module.exports = {
     // host: '0.0.0.0',
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        target: "http://localhost:5000",
         secure: false,
       },
     },
