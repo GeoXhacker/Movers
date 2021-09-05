@@ -25,6 +25,10 @@ module.exports = {
     app: "./src/js/app.js",
   },
 
+  // node: {
+  //   fs: "empty",
+  // },
+
   output: {
     path: resolvePath(isCordova ? "cordova/www" : "www"),
     filename: "js/[name].js",
@@ -38,9 +42,9 @@ module.exports = {
     alias: {
       "@": resolvePath("src"),
     },
-    fallback: {
-      fs: false,
-    },
+    // fallback: {
+    //   fs: false,
+    // },
   },
   devtool: env === "production" ? "source-map" : "eval",
   devServer: {
@@ -52,8 +56,8 @@ module.exports = {
     historyApiFallback: true,
     // host: '0.0.0.0',
     proxy: {
-      "/api": {
-        target: "http://localhost:5000",
+      "/client": {
+        target: "http://localhost:3001",
         secure: false,
       },
     },

@@ -1,34 +1,20 @@
-import { Card } from "framework7-react";
-import { Loader } from "google-maps";
-import React, { Component, createRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
-class Map extends Component {
-  constructor(props) {
-    super(props);
-    this.mapContainer = createRef();
-  }
 
-  componentDidMount() {
-    this.init();
-  }
+mapboxgl.accessToken =
+  "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
 
-  async init() {
-    const loader = new Loader("AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", {});
 
-    const google = await loader.load();
-    const map = new google.maps.Map(this.mapContainer.current, {
-      center: { lat: -34.397, lng: 150.644 },
-      zoom: 8,
-    });
-  }
 
-  render() {
-    return (
-      <Card>
-        <div ref={this.mapContainer}></div>
-      </Card>
-    );
-  }
+const Map = () => {
+
+   const mapContainer = useRef(null);
+ const map = useRef(null
+  return (  );
 }
-
+ 
 export default Map;
+);

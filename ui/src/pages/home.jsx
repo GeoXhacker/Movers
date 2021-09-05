@@ -1,6 +1,7 @@
 import {
   Block,
   BlockTitle,
+  Button,
   Card,
   Col,
   f7,
@@ -25,6 +26,7 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 // var mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
 // var MapboxDirections = require("@mapbox/mapbox-gl-directions");
+// import { MapboxDirections } from "@mapbox/mapbox-gl-directions";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
@@ -55,7 +57,15 @@ const HomePage = ({ f7router }) => {
   const map = useRef(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [zoom, setZoom] = useState(13);
+  const [userLoc, setUserLoc] = useState([0, 0]);
+
+  const getLoc = () => {
+    let pos = window.navigator.geolocation.getCurrentPosition((pos) => {
+      console.log("pos", pos);
+      setUserLoc([pos.coords.longitude, pos.coords.latitude]);
+    });
+  };
 
   useEffect(() => {
     console.log(map, "cur");
@@ -71,25 +81,26 @@ const HomePage = ({ f7router }) => {
       // color: "#FFFFFF",
       // draggable: true,
     })
-      .setLngLat([32.5675, 0.3335])
+      .setLngLat([32.4567, 0.2222])
       .addTo(map.current);
 
-    const marker2 = new mapboxgl.Marker({
-      // color: "#FFFFFF",
-      // draggable: true,
-    })
-      .setLngLat([32.5645, 0.3665])
-      .addTo(map.current);
+    // const marker2 = new mapboxgl.Marker({
+    //   // color: "#FFFFFF",
+    //   // draggable: true,
+    // })
+    //   .setLngLat([32.5645, 0.3665])
+    //   .addTo(map.current);
 
-    map.current.addControl(
-      new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
-        autocomplete: true,
-        countries: "ug",
-      })
-    );
-  });
+    // map.current.addControl(
+    //   new MapboxGeocoder({
+    //     accessToken: mapboxgl.accessToken,
+    //     mapboxgl: mapboxgl,
+    //     autocomplete: true,
+    //     countries: "ug",
+    //   })
+    // );
+    // getLoc();
+  }, []);
 
   // var directions = new MapboxDirections({
   //   accessToken: "YOUR-MAPBOX-ACCESS-TOKEN",
@@ -216,47 +227,17 @@ const HomePage = ({ f7router }) => {
           </Col>
         </Row>
       </Block>
-      {/* <Block>
-        
-        <Map
-          style="mapbox://styles/mapbox/streets-v9"
-          containerStyle={{
-            height: "50vh",
-            width: "100vw",
-          }}
-          center={[32.5825, 0.3476]}
-          zoom={[15]}
-        >
-          <Layer
-            // type="symbol"
-            // id="marker"
-            // layout={{ "icon-image": "marker-15" }}
-
-            type="circle"
-            id="marker"
-            paint={{
-              "circle-color": "#ff5200",
-              "circle-stroke-width": 1,
-              "circle-stroke-color": "#fff",
-              "circle-stroke-opacity": 1,
-            }}  
-          >
-            <Feature coordinates={[32.5675, 0.3335]} />
-          </Layer>
-           <Marker coordinates={[32.5675, 0.3335]}></Marker> 
-        </Map>
-      </Block> */}
-
-      <div>
-        <div className="sidebar">
+      {/* <Button onClick={getLoc}>get loc</Button> */}
+      <Card outline={true}>
+        {/* <div className="sidebar">
           Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        </div>
+        </div> */}
         <div
           ref={mapContainer}
           className="map-container"
-          style={{ height: 400 }}
+          style={{ height: 200 }}
         />
-      </div>
+      </Card>
     </Page>
   );
 };

@@ -1,6 +1,7 @@
 import {
   Button,
   f7,
+  Card,
   Fab,
   Icon,
   Link,
@@ -27,6 +28,16 @@ import { store } from "../js/store_redux";
 //   style: "mapbox://styles/mapbox/streets-v11",
 // });
 
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+// import "./map.css";
+
+// import ReactMapboxGl, { Layer, Feature, Marker } from "react-mapbox-gl";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+
+mapboxgl.accessToken =
+  "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
+
 export default function movePopUp({ children }) {
   const [popupOpened, setPopupOpened] = useState(false);
   const popup = useRef(null);
@@ -37,6 +48,56 @@ export default function movePopUp({ children }) {
   const [scheduleDate, setScheduleDate] = useState("");
   const [geoloclat, setGeoLocLat] = useState("");
   const [geoloclng, setGeoLocLng] = useState("");
+
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const [lng, setLng] = useState(-70.9);
+  const [lat, setLat] = useState(42.35);
+  const [zoom, setZoom] = useState(9);
+
+  useEffect(() => {
+    console.log(map, "cur");
+    if (map.current) return; // initialize map only once
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [32.5825, 0.3476],
+      zoom: zoom,
+    });
+
+    //  const marker1 = new mapboxgl.Marker({
+    //    // color: "#FFFFFF",
+    //    // draggable: true,
+    //  })
+    //    .setLngLat(userLoc)
+    //    .addTo(map.current);
+
+    // const marker2 = new mapboxgl.Marker({
+    //   // color: "#FFFFFF",
+    //   // draggable: true,
+    // })
+    //   .setLngLat([32.5645, 0.3665])
+    //   .addTo(map.current);
+
+    // map.current.addControl(
+    //   new MapboxGeocoder({
+    //     accessToken: mapboxgl.accessToken,
+    //     mapboxgl: mapboxgl,
+    //     autocomplete: true,
+    //     countries: "ug",
+    //   })
+    // );
+    // getLoc();
+  }, []);
+
+  useEffect(() => {
+    if (!map.current) return; // wait for map to initialize
+    map.current.on("move", () => {
+      setLng(map.current.getCenter().lng.toFixed(4));
+      setLat(map.current.getCenter().lat.toFixed(4));
+      setZoom(map.current.getZoom().toFixed(2));
+    });
+  });
 
   const dispatch = useDispatch();
   const API_URL = useSelector(selectAPI_URL);
@@ -53,7 +114,7 @@ export default function movePopUp({ children }) {
         const crd = pos.coords;
         setGeoLocLat(crd.latitude);
         setGeoLocLng(crd.longitude);
-
+        // dispatch({type: 'USER_LOC', payload:{lng: }})
         // console.log("Your current position is:");
         // console.log(`Latitude : ${crd.latitude}`);
         // console.log(`Longitude: ${crd.longitude}`);
@@ -93,7 +154,8 @@ export default function movePopUp({ children }) {
     // console.log(store.getState().token);
     let order = {
       moveType,
-      pickUpAddress: { lat: geoloclat, lng: geoloclng },
+      // pickUpAddress: { lat: geoloclat, lng: geoloclng },
+      pickUpAddress: { lat: "0.27701", lng: "32.3556" },
       destinationAddress: { lat: "0.2890523", lng: "32.5672294" },
       shiftNeed,
       scheduleDate,
@@ -177,8 +239,8 @@ export default function movePopUp({ children }) {
               }}
             ></ListInput>
             <ListItem>
-              <p>{`${geoloclat}, ${geoloclng}`}</p>
-              <Button onClick={getLoc}>get location</Button>
+              {/* <p>{`${geoloclat}, ${geoloclng}`}</p> */}
+              <Button onClick={getLoc}>mark my location</Button>
             </ListItem>
 
             <ListInput
@@ -245,6 +307,16 @@ export default function movePopUp({ children }) {
           </List>
           {/* <Map /> */}
           <div id="map"></div>
+          <Card outline={true}>
+            {/* <div className="sidebar">
+          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        </div> */}
+            <div
+              ref={mapContainer}
+              className="map-container"
+              style={{ height: 200 }}
+            />
+          </Card>
 
           <Fab
             position="center-bottom"

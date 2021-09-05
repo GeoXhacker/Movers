@@ -26,17 +26,17 @@ function ProfilePage() {
 
   const API_URL = useSelector(selectAPI_URL);
 
-  const put = () => {
-    f7.request({
-      method: "PUT",
-      url: `${API_URL}/orders/${order[3].id}`,
-    }).then((res) => {
-      // console.log(res.data);
-      // dispatch({ type: "updateStatus", payload: res.data.order });
-      // f7.dialog.alert("Your order has been approved");
-    });
-    console.log("put");
-  };
+  // const put = () => {
+  //   f7.request({
+  //     method: "PUT",
+  //     url: `${API_URL}/orders/${order[3].id}`,
+  //   }).then((res) => {
+  //     // console.log(res.data);
+  //     // dispatch({ type: "updateStatus", payload: res.data.order });
+  //     // f7.dialog.alert("Your order has been approved");
+  //   });
+  //   console.log("put");
+  // };
   return (
     <Page name="profile">
       <Navbar title="Profile" />
@@ -80,8 +80,6 @@ function ProfilePage() {
           </List>
         </Card>
       )}
-
-      <button onClick={put}> Put</button>
     </Page>
   );
 }

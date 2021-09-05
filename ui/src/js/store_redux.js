@@ -7,7 +7,8 @@ import storage from "redux-persist/lib/storage";
 //2.figure out the blue print for ur state
 export const initialState = {
   number: 25,
-  API_URL: "/api/v1",
+  API_URL: "/client/v1",
+
   token: "",
   moveOrders: [],
   deliveryOrders: [],
@@ -15,6 +16,7 @@ export const initialState = {
   n: 1,
   test: 30,
   socket: 0,
+  userLoc: [0, 0],
 };
 // 3.create a reducer function; that is gonna make the logic behind user actions
 export const reducer = (state = initialState, action) => {
@@ -66,7 +68,22 @@ export const reducer = (state = initialState, action) => {
         ),
         socket: state.socket + 1,
       };
+    case "setUserLoc":
+      return {
+        ...state,
+        userLoc: userLoc.map((e, index) => {
+          if (index !== action.index) {
+            // This isn't the e we care about - keep it as-is
+            return e;
+          }
 
+          // Otherwise, this is the one we want - return an updated value
+          return {
+            ...e,
+            ...action.e,
+          };
+        }),
+      };
     case "number/add": //naming convension name of slice followed by what its gon do
       return { ...state, number: state.number + 1 }; // what to do on dispatching action to store; ensure that u dont change the state directly; make a copy and modify that
 
