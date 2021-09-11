@@ -12,18 +12,22 @@ import {
   NavTitle,
   Page,
   Row,
+  Swiper,
+  SwiperSlide,
 } from "framework7-react";
 import React, { useRef, useEffect, useState } from "react";
-import Swiper from "react-id-swiper";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import MovePopup from "../components/move_popup";
 import PackagePopup from "../components/package_popup";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+
 // import "./map.css";
 
 // import ReactMapboxGl, { Layer, Feature, Marker } from "react-mapbox-gl";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import ReactMapboxAutocomplete from "./autocomplete";
+import { selectMAPTOKEN, selectToken } from "../js/store_redux";
 // var mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
 // var MapboxDirections = require("@mapbox/mapbox-gl-directions");
 // import { MapboxDirections } from "@mapbox/mapbox-gl-directions";
@@ -34,6 +38,7 @@ mapboxgl.accessToken =
 const params = {
   spaceBetween: 30,
   centeredSlides: true,
+  lazy: true,
   autoplay: {
     delay: 2000,
     disableOnInteraction: false,
@@ -59,16 +64,24 @@ const HomePage = ({ f7router }) => {
   const [lat, setLat] = useState(42.35);
   const [zoom, setZoom] = useState(13);
   const [userLoc, setUserLoc] = useState([0, 0]);
+  const [barners, setBarners] = useState([]);
+  const MAP_TOKEN = useSelector(selectToken);
+  const token = useSelector(selectToken);
 
-  const getLoc = () => {
-    let pos = window.navigator.geolocation.getCurrentPosition((pos) => {
-      console.log("pos", pos);
-      setUserLoc([pos.coords.longitude, pos.coords.latitude]);
+  const getBanners = () => {
+    f7.request({
+      url: "http://localhost:3001/api/v1/browse/attachments?role=banner",
+      method: "GET",
+      headers: {
+        "X-Access-Token": token,
+      },
+      dataType: "json",
+    }).then((res) => {
+      setBarners(res.data.items);
     });
   };
 
   useEffect(() => {
-    console.log(map, "cur");
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -77,62 +90,31 @@ const HomePage = ({ f7router }) => {
       zoom: zoom,
     });
 
+    map.current.addControl(
+      new mapboxgl.AttributionControl({
+        customAttribution: "Movers",
+      })
+    );
+
     const marker1 = new mapboxgl.Marker({
       // color: "#FFFFFF",
       // draggable: true,
     })
-      .setLngLat([32.4567, 0.2222])
+      .setLngLat([32.5934603903443, 0.333278013367931])
       .addTo(map.current);
 
-    // const marker2 = new mapboxgl.Marker({
-    //   // color: "#FFFFFF",
-    //   // draggable: true,
-    // })
-    //   .setLngLat([32.5645, 0.3665])
-    //   .addTo(map.current);
-
-    // map.current.addControl(
-    //   new MapboxGeocoder({
-    //     accessToken: mapboxgl.accessToken,
-    //     mapboxgl: mapboxgl,
-    //     autocomplete: true,
-    //     countries: "ug",
-    //   })
-    // );
-    // getLoc();
+    getBanners();
   }, []);
-
-  // var directions = new MapboxDirections({
-  //   accessToken: "YOUR-MAPBOX-ACCESS-TOKEN",
-  //   unit: "metric",
-  //   profile: "mapbox/driving",
-  // });
-
-  // map.current.addControl(directions, "top-left");
-
-  useEffect(() => {
-    if (!map.current) return; // wait for map to initialize
-    map.current.on("move", () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
-  });
 
   let dispatch = useDispatch();
   function logOut(f7router) {
-    // localStorage.setItem("x-mover-token", "");
-    // localStorage.setItem(
-    //   "user",
-    //   JSON.stringify({ username: "username", phone: "07xxxxxxxx" })
-    // );
-    // localStorage.setItem('orders', '[]')
     dispatch({ type: "moveOrders/deleteAll" });
     dispatch({ type: "deliveryOrders/deleteAll" });
     dispatch({ type: "logOut" });
     f7.dialog.alert("Thank you for using Movers");
     f7router.refreshPage();
   }
+
   return (
     <Page name="home">
       {/* Top Navbar */}
@@ -159,33 +141,41 @@ const HomePage = ({ f7router }) => {
           {/* <Icon iconMd='material:menu' size='30px' color='purple' onClick={() => {logOut()}}></Icon> */}
         </NavRight>
       </Navbar>
-
       {/* Page content */}
       <Block>
-        <Swiper {...params}>
-          <div>
+        <Swiper>
+          <SwiperSlide>
             <img
               data-src="static/banner1.jpg"
+              // {`http://localhost:3001/api/v1/attachment/${_id}`}
               style={{ width: "100%", height: 180 }}
-              className="lazy"
+              // className="lazy"
+              // data-lazy={{ enabled: true }}
             />
-          </div>
+          </SwiperSlide>
+          <SwiperSlide>2</SwiperSlide>
+          <SwiperSlide>4</SwiperSlide>
+          {/* {barners.map(({ _id }, index) => (
+            <SwiperSlide key={index}>
+              <img
+                data-src="static/banner1.jpg"
+                // {`http://localhost:3001/api/v1/attachment/${_id}`}
+                style={{ width: "100%", height: 180 }}
+                className="lazy"
+                data-lazy={{ enabled: true }}
+              />
+            </SwiperSlide>
+          ))}
 
-          <div>
-            <img
-              data-src="static/banner3.jpeg"
-              style={{ width: "100%", height: 180 }}
-              className="lazy"
-            />
-          </div>
-
-          <div>
-            <img
-              data-src="static/banner2.jpg"
-              style={{ width: "100%", height: 180 }}
-              className="lazy"
-            />
-          </div>
+          {!barners.length && (
+            <SwiperSlide>
+              <img
+                data-src="static/banner1.jpg"
+                style={{ width: "100%", height: 180 }}
+                className="lazy"
+              />
+            </SwiperSlide>
+          )} */}
         </Swiper>
       </Block>
       <BlockTitle>Select Service</BlockTitle>
@@ -227,11 +217,7 @@ const HomePage = ({ f7router }) => {
           </Col>
         </Row>
       </Block>
-      {/* <Button onClick={getLoc}>get loc</Button> */}
       <Card outline={true}>
-        {/* <div className="sidebar">
-          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        </div> */}
         <div
           ref={mapContainer}
           className="map-container"

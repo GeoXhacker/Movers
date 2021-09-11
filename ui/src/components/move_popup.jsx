@@ -14,49 +14,46 @@ import {
   Popup,
 } from "framework7-react";
 import React, { useRef, useState, useEffect } from "react";
-// import store from "../js/store";
-// import Map from "./map";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAPI_URL, selectToken } from "../js/store_redux";
-import { store } from "../js/store_redux";
-// var mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
-
-// mapboxgl.accessToken =
-//   "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
-// var map = new mapboxgl.Map({
-//   container: "map",
-//   style: "mapbox://styles/mapbox/streets-v11",
-// });
+import { selectAPI_URL, selectToken, selectMAPTOKEN } from "../js/store_redux";
 
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import "./map.css";
-
-// import ReactMapboxGl, { Layer, Feature, Marker } from "react-mapbox-gl";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import MapboxAutocomplete from "react-mapbox-autocomplete";
+// var MapboxDirections = require("@mapbox/mapbox-gl-directions");
+import ReactMapboxAutocomplete from "../pages/autocomplete";
+import DestinationAutoComplete from "../pages/destinationAutoCom";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
+// mapboxgl.accessToken =
+// "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
 
 export default function movePopUp({ children }) {
   const [popupOpened, setPopupOpened] = useState(false);
   const popup = useRef(null);
   const [moveType, setMoveType] = useState("");
-  const [pickUpAddress, setPickUp] = useState("");
-  const [destinationAddress, setDestination] = useState("");
+  const [pickUpAddress, setPickUp] = useState({});
+  const [destinationAddress, setDestination] = useState({});
+  const [pickUpAddressName, setPickUpName] = useState("");
+  const [destinationAddressName, setDestinationName] = useState("");
   const [shiftNeed, setShiftNeed] = useState("");
-  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleDate, setScheduleDate] = useState(Date.now());
+  const [scheduleTime, setScheduleTime] = useState("");
   const [geoloclat, setGeoLocLat] = useState("");
   const [geoloclng, setGeoLocLng] = useState("");
+  const dispatch = useDispatch();
+  const API_URL = useSelector(selectAPI_URL);
+  const token = useSelector(selectToken);
+  const MAP_TOKEN = useSelector(selectMAPTOKEN);
 
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
   const [zoom, setZoom] = useState(9);
+  const geocoderC = useRef(null);
 
   useEffect(() => {
-    console.log(map, "cur");
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -65,103 +62,43 @@ export default function movePopUp({ children }) {
       zoom: zoom,
     });
 
-    //  const marker1 = new mapboxgl.Marker({
-    //    // color: "#FFFFFF",
-    //    // draggable: true,
-    //  })
-    //    .setLngLat(userLoc)
-    //    .addTo(map.current);
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+    });
 
-    // const marker2 = new mapboxgl.Marker({
-    //   // color: "#FFFFFF",
-    //   // draggable: true,
-    // })
-    //   .setLngLat([32.5645, 0.3665])
-    //   .addTo(map.current);
+    const marker1 = new mapboxgl.Marker({
+      // color: "#FFFFFF",
+      // draggable: true,
+    })
+      .setLngLat([lng, lat])
+      .addTo(map.current);
 
-    // map.current.addControl(
-    //   new MapboxGeocoder({
-    //     accessToken: mapboxgl.accessToken,
-    //     mapboxgl: mapboxgl,
-    //     autocomplete: true,
-    //     countries: "ug",
-    //   })
-    // );
-    // getLoc();
+    map.current.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        // When active the map will receive updates to the device's location as it changes.
+        trackUserLocation: true,
+        // Draw an arrow next to the location dot to indicate which direction the device is heading.
+        showUserHeading: true,
+      })
+    );
   }, []);
 
-  useEffect(() => {
-    if (!map.current) return; // wait for map to initialize
-    map.current.on("move", () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
-  });
-
-  const dispatch = useDispatch();
-  const API_URL = useSelector(selectAPI_URL);
-  const token = useSelector(selectToken);
-
-  const getLoc = () => {
-    if (window.navigator.geolocation) {
-      const options = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0,
-      };
-      function success(pos) {
-        const crd = pos.coords;
-        setGeoLocLat(crd.latitude);
-        setGeoLocLng(crd.longitude);
-        // dispatch({type: 'USER_LOC', payload:{lng: }})
-        // console.log("Your current position is:");
-        // console.log(`Latitude : ${crd.latitude}`);
-        // console.log(`Longitude: ${crd.longitude}`);
-        // console.log(`More or less ${crd.accuracy} meters.`);
-      }
-
-      function errors(err) {
-        console.warn(`ERROR(${err.code}): ${err.message}`);
-      }
-      window.navigator.permissions
-        .query({ name: "geolocation" })
-        .then(function (result) {
-          if (result.state === "granted") {
-            console.log(result.state);
-            // If granted then you can directly call your function here
-            window.navigator.geolocation.getCurrentPosition(success);
-          } else if (result.state === "prompt") {
-            window.navigator.geolocation.getCurrentPosition(
-              success,
-              errors,
-              options
-            );
-          } else if (result.state === "denied") {
-            // If denied then you have to show instructions to enable location
-          }
-          result.onchange = function () {
-            console.log(result.state);
-          };
-        });
-    } else {
-      alert("Sorry Not available!");
-    }
-  };
-
   function submitOrder() {
-    //  console.log('done')
-    // console.log(store.getState().token);
     let order = {
       moveType,
-      // pickUpAddress: { lat: geoloclat, lng: geoloclng },
-      pickUpAddress: { lat: "0.27701", lng: "32.3556" },
-      destinationAddress: { lat: "0.2890523", lng: "32.5672294" },
+      pickUpAddress,
+      destinationAddress,
+      pickUpAddressName,
+      destinationAddressName,
       shiftNeed,
       scheduleDate,
+      scheduleTime,
     };
 
-    // setTimeout(f7.dialog.preloader("Processing order"), 3000)
     f7.dialog.preloader("Processing order");
 
     f7.request({
@@ -178,7 +115,6 @@ export default function movePopUp({ children }) {
         f7.dialog.close();
         setPopupOpened(false);
         f7.dialog.alert(res.data.message);
-        // store.dispatch("saveMoveOrder", res.data.orderInfo);
         dispatch({ type: "moveOrders/add", payload: res.data.orderInfo });
       })
       .catch(function (e) {
@@ -186,6 +122,59 @@ export default function movePopUp({ children }) {
         f7.dialog.alert("something went wrong");
       });
   }
+  var currentMarkers = [];
+  const marker1 = new mapboxgl.Marker();
+  const suggestionSelectPickUp = async (result, lat, lng, text) => {
+    console.log(result, lat, lng, text);
+    setLng(lng);
+    setLat(lat);
+
+    //set coords to be sent
+    setPickUp({ lat: lat, lng: lng });
+    setPickUpName(text);
+
+    // remove markers
+    if (currentMarkers !== null) {
+      console.log("marker found"); // let obj = {
+      //   k: "",
+      //   r: 2,
+      //   y: 3,
+      // };
+      // function isEmpty(obj) {
+      //   console.log(Object.values(obj).some((element) => element == ""));
+      //   return !Object.values(obj).some((element) => element !== null);
+      // }
+
+      // isEmpty(obj);
+      console.log(currentMarkers);
+      for (var i = currentMarkers.length - 1; i >= 0; i--) {
+        currentMarkers[i].remove();
+      }
+    }
+
+    marker1.setLngLat([lng, lat]).addTo(map.current);
+    currentMarkers.push(marker1);
+
+    setGeoLocLat(lng);
+    await map.current.flyTo({ center: [lng, lat] });
+
+    console.log("seting done");
+  };
+
+  const suggestionSelectDest = async (result, lat, lng, text) => {
+    console.log(result, lat, lng, text);
+    setLng(lng);
+    setLat(lat);
+
+    //set coords to be sent
+
+    setDestination({ lat: lat, lng: lng });
+    setDestinationName(text);
+    // console.log(destinationAddress, "dest");
+
+    setGeoLocLat(lng);
+    await map.current.flyTo({ center: [lng, lat] });
+  };
 
   return (
     <>
@@ -210,40 +199,79 @@ export default function movePopUp({ children }) {
               />
             </NavRight>
           </Navbar>
-          {/* content */}
 
-          <List form>
+          <List form style={{ marginTop: 5, marginBottom: 5 }}>
             <ListInput
               label="Move type"
               type="select"
-              // defaultValue="select shift type"
               placeholder="Please choose..."
               onChange={(e) => {
                 console.log(e.target.value);
                 setMoveType(e.target.value);
               }}
+              required={true}
+              outline
             >
               <option value="null">select move type...</option>
               <option value="Within Kampala">Within Kampala</option>
               <option value="Outside Kampala">Outside Kampala</option>
             </ListInput>
-            <ListInput
+            <ReactMapboxAutocomplete
+              onSuggestionSelect={suggestionSelectPickUp}
+              onInputEmpty={() => {
+                console.log("am empty");
+              }}
+              country="ug"
+              resetSearch={false}
+              country="ug"
+              apiToken={MAP_TOKEN}
               label="Shifting from"
               type="text"
               placeholder="Name of place"
               clearButton
               floatingLabel
               outline
-              onInput={(e) => {
-                setPickUp(e.target.value);
+            />
+            {/* <ReactMapboxAutocomplete
+              onSuggestionSelect={suggestionSelect}
+              country="ug"
+              resetSearch={false}
+              country="ug"
+              // apiToken="pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ"
+              label="To"
+              type="text"
+              placeholder="shifting to?"
+              clearButton
+              floatingLabel
+              outline
+              onInputEmpty={() => {
+                console.log("destination");
+                marker1.remove();
+                console.log("removed");
               }}
-            ></ListInput>
-            <ListItem>
-              {/* <p>{`${geoloclat}, ${geoloclng}`}</p> */}
-              <Button onClick={getLoc}>mark my location</Button>
-            </ListItem>
+            /> */}
 
-            <ListInput
+            <DestinationAutoComplete
+              onSuggestionSelect={suggestionSelectDest}
+              country="ug"
+              resetSearch={false}
+              country="ug"
+              apiToken={MAP_TOKEN}
+              label="To"
+              type="text"
+              placeholder="shifting to?"
+              clearButton
+              floatingLabel
+              outline
+              onInputEmpty={() => {
+                console.log("destination");
+                marker1.remove();
+                console.log("removed");
+              }}
+            />
+            {/* </ListItem> */}
+
+            {/* <ListInput
               label="To"
               type="text"
               placeholder="shifting to?"
@@ -253,31 +281,52 @@ export default function movePopUp({ children }) {
               onInput={(e) => {
                 setDestination(e.target.value);
               }}
-            ></ListInput>
-            {/* <ListInput
-              calendarParams={{
-                timePicker: true,
-                openIn: "popup",
-                header: true,
-                headerPlaceholder: "Shifting time",
-                closeOnSelect: true,
-                dateFormat: "dd-mm-yyyy hh::mm A",
-              }}
-              label="Date time"
-              type="datepicker"
-              placeholder="Please choose..."
-              floatingLabel
-              outline
-              calendarChange={(value) => console.log(value)}
             ></ListInput> */}
             <ListInput
-              label="Schedule"
+              label="Schedule Date"
               type="date"
+              // type="datetime-local"
+              // timePicker
+              defaultValue={scheduleDate}
               placeholder="Please choose..."
               onInput={(e) => {
+                console.log(e.target.value);
                 setScheduleDate(e.target.value);
               }}
-            ></ListInput>
+              required={true}
+              outline
+            />
+            <ListInput
+              label="Schedule Time"
+              type="time"
+              // type="datetime-local"
+              // timePicker
+              // defaultValue="2014-04-30"
+              placeholder="Please choose..."
+              onInput={(e) => {
+                console.log(e.target.value);
+                setScheduleTime(e.target.value);
+              }}
+              outline
+              required={true}
+            />
+            {/* <ListInput
+              label="test"
+              type="text"
+              // type="datetime-local"
+              // timePicker
+              // defaultValue="2014-04-30"
+              placeholder="Please choose..."
+              onInput={(e) => {
+                console.log(e.target.value);
+                setScheduleTime(e.target.value);
+              }}
+              outline
+              onInputEmpty={() => {
+                console.log("input cleard");
+              }}
+            /> */}
+
             <ListItem
               title="Select shifting need"
               smartSelect
@@ -285,6 +334,7 @@ export default function movePopUp({ children }) {
                 openIn: "popover",
                 closeOnSelect: true,
               }}
+              outline
             >
               <select
                 name="shiftNeed"
@@ -305,16 +355,12 @@ export default function movePopUp({ children }) {
               </select>
             </ListItem>
           </List>
-          {/* <Map /> */}
-          <div id="map"></div>
+
           <Card outline={true}>
-            {/* <div className="sidebar">
-          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        </div> */}
             <div
               ref={mapContainer}
               className="map-container"
-              style={{ height: 200 }}
+              style={{ height: 150 }}
             />
           </Card>
 

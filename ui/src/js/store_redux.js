@@ -1,5 +1,7 @@
 //1. import redux store;
 import { createStore } from "redux";
+import { composeWithDevTools } from "redux-devtools-extension";
+
 // for state persistance after refresh
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
@@ -13,10 +15,8 @@ export const initialState = {
   moveOrders: [],
   deliveryOrders: [],
   user: {},
-  n: 1,
-  test: 30,
-  socket: 0,
-  userLoc: [0, 0],
+  MAP_TOKEN:
+    "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ",
 };
 // 3.create a reducer function; that is gonna make the logic behind user actions
 export const reducer = (state = initialState, action) => {
@@ -25,12 +25,17 @@ export const reducer = (state = initialState, action) => {
       return { ...state, token: action.payload };
 
     case "moveOrders/add":
-      return { ...state, moveOrders: [...state.moveOrders, action.payload] }; //payload is an obj
+      return { ...state, moveOrders: [action.payload, ...state.moveOrders] }; //payload is an obj
 
     case "serverMoveOrders/add":
       return {
         ...state,
         moveOrders: [...state.moveOrders].concat(action.payload),
+      };
+    case "serverDeliveryOrders/add":
+      return {
+        ...state,
+        deliveryOrders: [...state.deliveryOrders].concat(action.payload),
       };
 
     case "moveOrders/deleteAll":
@@ -39,7 +44,7 @@ export const reducer = (state = initialState, action) => {
     case "deliveryOrders/add":
       return {
         ...state,
-        deliveryOrders: [...state.deliveryOrders, action.payload],
+        deliveryOrders: [action.payload, ...state.deliveryOrders],
       };
     case "deliveryOrders/deleteAll":
       return { ...state, deliveryOrders: [] };
@@ -58,16 +63,32 @@ export const reducer = (state = initialState, action) => {
     //         : order
     //     ),
     //   };
+    // case "updateStatus":
+    //   return {
+    //     ...state,
+    //     moveOrders: state.moveOrders.map((order) =>
+    //       order.id === action.payload.id
+    //         ? { ...order, status: action.payload.status }
+    //         : order
+    //     ),
+    //     socket: state.socket + 1,
+    //   };
+
     case "updateStatus":
       return {
         ...state,
         moveOrders: state.moveOrders.map((order) =>
-          order.id === action.payload.id
+          order._id === action.payload.id
             ? { ...order, status: action.payload.status }
             : order
         ),
-        socket: state.socket + 1,
+        deliveryOrders: state.deliveryOrders.map((order) =>
+          order._id === action.payload.id
+            ? { ...order, status: action.payload.status }
+            : order
+        ),
       };
+
     case "setUserLoc":
       return {
         ...state,
@@ -104,7 +125,7 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, reducer);
-export const store = createStore(persistedReducer);
+export const store = createStore(persistedReducer, composeWithDevTools());
 export const persistor = persistStore(store);
 
 //  SELECTORS
@@ -137,4 +158,8 @@ export const selectUser = (state) => {
 
 export const selectRedux = (state) => {
   return state.reduxReducer.number;
+};
+
+export const selectMAPTOKEN = (state) => {
+  return state.MAP_TOKEN;
 };

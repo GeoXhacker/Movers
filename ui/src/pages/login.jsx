@@ -29,15 +29,11 @@ export default ({ f7router }) => {
           // .json(`${f7.store.state.API_URL}/auth/verify/${phone}/${code}`)
           .then(function (res) {
             let token = res.data.token;
-            // localStorage.setItem('x-mover-token', token);
-
-            // f7.store.dispatch("setToken", token); //dispatch({action.type, action.payload'token'})
+            // console.log(res.data.deliveryOrders);
             dispatch({ type: "token/setToken", payload: token });
-            f7router.refreshPage();
-            // console.log(res.data.data);
-            // localStorage.setItem("user", JSON.stringify(res.data.userInfo));
-
             dispatch({ type: "user/addInfo", payload: res.data.userInfo });
+
+            f7router.refreshPage();
           })
           .catch(function (e) {
             f7.dialog.alert("Invalid code");
@@ -52,12 +48,17 @@ export default ({ f7router }) => {
       if (yes) {
         f7.request
           .post(`${API_URL}/auth`, { username, phone })
-          // .post(`${f7.store.state.API_URL}/auth`, { username, phone })
           .then(function (res) {
             let user = JSON.parse(res.data);
 
             if (user.exist) {
-              console.log(user.moveOrders);
+              dispatch({ type: "user/addInfo", payload: user.userInfo });
+
+              dispatch({
+                type: "serverDeliveryOrders/add",
+                payload: user.deliveryOrders,
+              });
+
               dispatch({
                 type: "serverMoveOrders/add",
                 payload: user.moveOrders,
@@ -65,8 +66,6 @@ export default ({ f7router }) => {
 
               dispatch({ type: "token/setToken", payload: user.token });
               f7router.refreshPage();
-              dispatch({ type: "user/addInfo", payload: user.userInfo });
-              console.log("dispatch done");
             } else confirmPhone();
           })
           .catch(function (e) {
@@ -101,10 +100,6 @@ export default ({ f7router }) => {
           onInput={(e) => {
             setPhone(e.target.value);
           }}
-          // onFocus={(e) => {
-          //   e.target.value = 1234567890;
-          //   setPhone(e.target.value);
-          // }}
         />
       </List>
       <List>

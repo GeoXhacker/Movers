@@ -19,7 +19,13 @@ import routes from "../js/routes";
 import store from "../js/store";
 import socket from "../js/socket";
 import { useSelector, useDispatch } from "react-redux";
-import { selectSocket, selectMoveOrders, selectToken } from "../js/store_redux";
+import {
+  selectSocket,
+  selectMoveOrders,
+  selectToken,
+  selectDeliveryOrders,
+} from "../js/store_redux";
+
 // import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
 // mapboxgl.accessToken =
@@ -28,6 +34,7 @@ import { selectSocket, selectMoveOrders, selectToken } from "../js/store_redux";
 const MyApp = () => {
   const token = useSelector(selectToken);
   const moveOrders = useSelector(selectMoveOrders);
+  const deliveryOrders = useSelector(selectDeliveryOrders);
   const socketCount = useSelector(selectSocket);
   const dispatch = useDispatch();
   // Login screen demo data
@@ -35,31 +42,67 @@ const MyApp = () => {
   const [password, setPassword] = useState("");
   const device = getDevice();
 
+  // useEffect(() => {
+  //   if (token) {
+  //     let conn = socket.connect(f7, token);
+  //     conn.on("notifications", (doc) => {
+  //       console.log("update", doc);
+
+  //       moveOrders.filter((order) =>
+  //         doc.some((update) => {
+  //           if (order.id === update.order) {
+  //             console.log(order, update);
+  //             console.log("starting dispatch");
+
+  //             dispatch({
+  //               type: "updateStatus",
+  //               payload: {
+  //                 id: update.order,
+  //                 status: update.status,
+  //               },
+  //             });
+  //             console.log("dispatched");
+  //             // conn.emit("checkDb", doc);
+  //           }
+  //         })
+  //       );
+  //     });
+  //   }
+  // }, []);
+
   useEffect(() => {
     if (token) {
       let conn = socket.connect(f7, token);
       conn.on("notifications", (doc) => {
-        console.log("update", doc);
-
-        moveOrders.filter((order) =>
-          doc.some((update) => {
-            if (order.id === update.order) {
-              console.log(order, update);
-              console.log("starting dispatch");
-
-              dispatch({
-                type: "updateStatus",
-                payload: {
-                  id: update.order,
-                  status: update.status,
-                },
-              });
-              console.log("dispatched");
-              // conn.emit("checkDb", doc);
-            }
-          })
-        );
+        // console.log("update", doc);
       });
+
+      conn.on("doc", (doc) => {
+        // console.log(doc, "notification");
+      });
+
+      // conn.on("check", (e) => {
+      //   console.log(e);
+      // });
+      // conn.io.on("reconnect", (e) => {
+      //   console.log(e, "reconnect");
+
+      //   conn.emit("reconnected", "hi", "how");
+      //   console.log(e, "reconnectd");
+      // });
+
+      conn.on("test", (data) => {
+        // console.log("socket", data);
+        // console.log("start dispatch");
+        dispatch({
+          type: "updateStatus",
+          payload: { id: data.order, status: data.status },
+        });
+
+        // console.log("dispatched");
+      }); // conn.on("check", (e) => {
+      //   console.log(e);
+      // });
     }
   }, []);
 

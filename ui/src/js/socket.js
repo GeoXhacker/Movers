@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 export default {
-  connect(f7, token, serverUrl = "http://localhost:5000") {
+  connect(f7, token, serverUrl = "http://localhost:3001") {
     this.f7 = f7;
     const socket = (f7.socket = io(serverUrl, {
       reconnectionAttempts: 10,
