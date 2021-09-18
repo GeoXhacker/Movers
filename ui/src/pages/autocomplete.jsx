@@ -44,7 +44,9 @@ const ReactMapboxAutocomplete = (props) => {
         })
         .catch((err) => {
           setError(true);
-          setErrMsg("There was a problem retrieving data from mapbox");
+          setErrMsg(
+            "There was a problem retrieving data from mapbox, make sure are connnected to internet"
+          );
           setQResults([]);
         });
     } else {

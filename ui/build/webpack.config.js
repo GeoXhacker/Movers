@@ -7,6 +7,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
+const Dotenv = require("dotenv-webpack");
 const path = require("path");
 
 function resolvePath(dir) {
@@ -181,6 +182,7 @@ module.exports = {
       "process.env.NODE_ENV": JSON.stringify(env),
       "process.env.TARGET": JSON.stringify(target),
     }),
+    new Dotenv(),
 
     ...(env === "production"
       ? [new CssMinimizerPlugin()]

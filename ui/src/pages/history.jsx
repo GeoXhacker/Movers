@@ -44,7 +44,7 @@ const HistoryPage = () => {
               subtitle={`${order.pickUpAddressName} to ${order.destinationAddressName}`}
               text={`${order.shiftNeed || "Date"}    ${
                 order.scheduleDate || order.date
-              }`}
+              }  ${order.scheduleTime}`}
               key={index}
             >
               <Link slot="media">

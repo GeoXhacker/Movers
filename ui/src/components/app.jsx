@@ -99,6 +99,8 @@ const MyApp = () => {
           payload: { id: data.order, status: data.status },
         });
 
+        f7.dialog.alert("Your Order has been approved");
+
         // console.log("dispatched");
       }); // conn.on("check", (e) => {
       //   console.log(e);

@@ -12,8 +12,6 @@ import {
   NavTitle,
   Page,
   Row,
-  Swiper,
-  SwiperSlide,
 } from "framework7-react";
 import React, { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +19,8 @@ import MovePopup from "../components/move_popup";
 import PackagePopup from "../components/package_popup";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import { Swiper, SwiperSlide } from "swiper/react";
+// import "swiper/css";
 
 // import "./map.css";
 
@@ -114,6 +114,7 @@ const HomePage = ({ f7router }) => {
     f7.dialog.alert("Thank you for using Movers");
     f7router.refreshPage();
   }
+  console.log(process.env);
 
   return (
     <Page name="home">
@@ -144,38 +145,18 @@ const HomePage = ({ f7router }) => {
       {/* Page content */}
       <Block>
         <Swiper>
-          <SwiperSlide>
-            <img
-              data-src="static/banner1.jpg"
-              // {`http://localhost:3001/api/v1/attachment/${_id}`}
-              style={{ width: "100%", height: 180 }}
-              // className="lazy"
-              // data-lazy={{ enabled: true }}
-            />
-          </SwiperSlide>
-          <SwiperSlide>2</SwiperSlide>
-          <SwiperSlide>4</SwiperSlide>
-          {/* {barners.map(({ _id }, index) => (
-            <SwiperSlide key={index}>
-              <img
-                data-src="static/banner1.jpg"
-                // {`http://localhost:3001/api/v1/attachment/${_id}`}
-                style={{ width: "100%", height: 180 }}
-                className="lazy"
-                data-lazy={{ enabled: true }}
-              />
-            </SwiperSlide>
-          ))}
-
-          {!barners.length && (
-            <SwiperSlide>
-              <img
-                data-src="static/banner1.jpg"
-                style={{ width: "100%", height: 180 }}
-                className="lazy"
-              />
-            </SwiperSlide>
-          )} */}
+          {barners ? (
+            barners.map(({ _id }, index) => (
+              <SwiperSlide key={index}>
+                <img
+                  src={`${process.env.MOVERS_HOST}/api/v1/attachment/${_id}`}
+                  style={{ width: "100%", height: 180 }}
+                />
+              </SwiperSlide>
+            ))
+          ) : (
+            <SwiperSlide>no barners to display</SwiperSlide>
+          )}
         </Swiper>
       </Block>
       <BlockTitle>Select Service</BlockTitle>

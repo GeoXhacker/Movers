@@ -44,7 +44,9 @@ const DestinationAutocomplete = (props) => {
         })
         .catch((err) => {
           setError(true);
-          setErrMsg("There was a problem retrieving data from mapbox");
+          setErrMsg(
+            "There was a problem retrieving places, make sure are connected to internet"
+          );
           setQResults([]);
         });
     } else {
@@ -123,9 +125,7 @@ const DestinationAutocomplete = (props) => {
             );
           })}
 
-          {error && (
-            <div className="react-mapbox-ac-suggestion">{errorMsg}</div>
-          )}
+          {error && <div>{errorMsg}</div>}
         </div>
       </span>
     </ul>

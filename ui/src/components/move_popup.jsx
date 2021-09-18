@@ -50,7 +50,7 @@ export default function movePopUp({ children }) {
   const map = useRef(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [zoom, setZoom] = useState(13);
   const geocoderC = useRef(null);
 
   useEffect(() => {
@@ -224,7 +224,8 @@ export default function movePopUp({ children }) {
               country="ug"
               resetSearch={false}
               country="ug"
-              apiToken={MAP_TOKEN}
+              // apiToken={MAP_TOKEN}
+              apiToken={process.env.MAP_TOKEN}
               label="Shifting from"
               type="text"
               placeholder="Name of place"
@@ -256,7 +257,8 @@ export default function movePopUp({ children }) {
               country="ug"
               resetSearch={false}
               country="ug"
-              apiToken={MAP_TOKEN}
+              // apiToken={MAP_TOKEN}
+              apiToken={process.env.MAP_TOKEN}
               label="To"
               type="text"
               placeholder="shifting to?"
@@ -360,7 +362,8 @@ export default function movePopUp({ children }) {
             <div
               ref={mapContainer}
               className="map-container"
-              style={{ height: 150 }}
+              // style={{ height: 150 }}
+              style={{ height: 150, width: "100%" }}
             />
           </Card>
 

@@ -43,10 +43,11 @@ export default function deliveryPopUp({ children }) {
   const map = useRef(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [zoom, setZoom] = useState(13);
   const geocoderC = useRef(null);
 
-  mapboxgl.accessToken = MAP_TOKEN;
+  // mapboxgl.accessToken = MAP_TOKEN;
+  mapboxgl.accessToken = process.env.MAP_TOKEN;
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -106,10 +107,7 @@ export default function deliveryPopUp({ children }) {
     marker1.setLngLat([lng, lat]).addTo(map.current);
     currentMarkers.push(marker1);
 
-    setGeoLocLat(lng);
     await map.current.flyTo({ center: [lng, lat] });
-
-    // console.log("seting done");
   };
 
   const suggestionSelectDest = async (result, lat, lng, text) => {
@@ -124,12 +122,10 @@ export default function deliveryPopUp({ children }) {
     setDestination({ lat: lat, lng: lng });
     // console.log(destinationAddress, "dest");
 
-    setGeoLocLat(lng);
     await map.current.flyTo({ center: [lng, lat] });
   };
 
   function submitOrder() {
-    //  console.log('done')
     let order = {
       what,
       instructions,
@@ -205,10 +201,6 @@ export default function deliveryPopUp({ children }) {
               outline
               // defaultValue="select shift type"
               placeholder="eg, food, clothes, scholastics..."
-              onFocus={(e) => {
-                e.target.value = "clothes";
-                setWhat(e.target.value);
-              }}
             ></ListInput>
             <ListInput
               label="Delivery Instructions"
@@ -216,30 +208,8 @@ export default function deliveryPopUp({ children }) {
               floatingLabel
               outline
               resizable={true}
-              onFocus={(e) => {
-                e.target.value = "Handle it with clear, very delicate";
-                setInstructions(e.target.value);
-              }}
             />
-            <ListInput
-              label="Recipient contant"
-              floatingLabel
-              outline
-              onFocus={(e) => {
-                e.target.value = "0751879095";
-                setRecipient(e.target.value);
-              }}
-            />
-            {/* <ListInput
-              label="From"
-              placeholder="Name of pickup"
-              floatingLabel
-              outline
-              onFocus={(e) => {
-                e.target.value = "Gulu";
-                setPickUpAddress(e.target.value);
-              }}
-            /> */}
+            <ListInput label="Recipient contant" floatingLabel outline />
 
             <ReactMapboxAutocomplete
               onSuggestionSelect={suggestionSelectPickUp}
@@ -249,7 +219,8 @@ export default function deliveryPopUp({ children }) {
               country="ug"
               resetSearch={false}
               country="ug"
-              apiToken={MAP_TOKEN}
+              // apiToken={MAP_TOKEN}
+              apiToken={process.env.MAP_TOKEN}
               label="Shifting from"
               type="text"
               placeholder="Name of place"
@@ -257,41 +228,27 @@ export default function deliveryPopUp({ children }) {
               floatingLabel
               outline
             />
-            {/* <ListInput
-              label="To"
-              placeholder="Name of destination"
-              floatingLabel
-              outline
-              onFocus={(e) => {
-                e.target.value = "Kampala";
-                setDestinationAddress(e.target.value);
-              }}
-            /> */}
 
             <DestinationAutoComplete
               onSuggestionSelect={suggestionSelectDest}
               country="ug"
               resetSearch={false}
               country="ug"
-              apiToken={MAP_TOKEN}
+              // apiToken={MAP_TOKEN}
+              apiToken={process.env.MAP_TOKEN}
               label="To"
               type="text"
               placeholder="shifting to?"
               clearButton
               floatingLabel
               outline
-              onInputEmpty={() => {
-                console.log("destination");
-                marker1.remove();
-                console.log("removed");
-              }}
             />
           </List>
           <Card outline={true}>
             <div
               ref={mapContainer}
               className="map-container"
-              style={{ height: 150 }}
+              style={{ height: 150, width: "100%" }}
             />
           </Card>
           <Fab
