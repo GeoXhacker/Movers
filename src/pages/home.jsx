@@ -70,7 +70,7 @@ const HomePage = ({ f7router }) => {
 
   const getBanners = () => {
     f7.request({
-      url: "http://localhost:3001/api/v1/browse/attachments?role=banner",
+      url: `${process.env.MOVERS_HOST}/api/v1/browse/attachments?role=banner`,
       method: "GET",
       headers: {
         "X-Access-Token": token,
@@ -114,7 +114,9 @@ const HomePage = ({ f7router }) => {
     f7.dialog.alert("Thank you for using Movers");
     f7router.refreshPage();
   }
-  console.log(process.env);
+  console.log(process.env.MAP_TOKEN);
+
+  const banners = ["banner1.jpg", "banner2.jpg", "banner3.jpeg"];
 
   return (
     <Page name="home">
@@ -145,18 +147,23 @@ const HomePage = ({ f7router }) => {
       {/* Page content */}
       <Block>
         <Swiper>
-          {barners ? (
-            barners.map(({ _id }, index) => (
-              <SwiperSlide key={index}>
-                <img
-                  src={`${process.env.MOVERS_HOST}/api/v1/attachment/${_id}`}
-                  style={{ width: "100%", height: 180 }}
-                />
-              </SwiperSlide>
-            ))
-          ) : (
-            <SwiperSlide>no barners to display</SwiperSlide>
-          )}
+          {barners.length
+            ? barners.map(({ _id }, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={`${process.env.MOVERS_HOST}/api/v1/attachment/${_id}`}
+                    style={{ width: "100%", height: 180 }}
+                  />
+                </SwiperSlide>
+              ))
+            : banners.map((banner, i) => (
+                <SwiperSlide key={i}>
+                  <img
+                    src={`../static/${banner}`}
+                    style={{ width: "100%", height: 180 }}
+                  />
+                </SwiperSlide>
+              ))}
         </Swiper>
       </Block>
       <BlockTitle>Select Service</BlockTitle>
