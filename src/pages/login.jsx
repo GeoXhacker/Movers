@@ -10,6 +10,7 @@ import {
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAPI_URL, selectMoveOrders } from "../js/store_redux";
+import config from "../config";
 
 export default ({ f7router }) => {
   const [username, setUsername] = useState("");
@@ -25,7 +26,7 @@ export default ({ f7router }) => {
       "Confirm",
       function (code) {
         f7.request
-          .json(`${API_URL}/auth/verify/${phone}/${code}`)
+          .json(`${config.API_URL}/client/v1/auth/verify/${phone}/${code}`)
           // .json(`${f7.store.state.API_URL}/auth/verify/${phone}/${code}`)
           .then(function (res) {
             let token = res.data.token;
@@ -47,7 +48,7 @@ export default ({ f7router }) => {
     f7.dialog.confirm(`Username: ${username}<br>Phone: ${phone}`, (yes) => {
       if (yes) {
         f7.request
-          .post(`${API_URL}/auth`, { username, phone })
+          .post(`${config.API_URL}/client/v1/auth`, { username, phone })
           .then(function (res) {
             let user = JSON.parse(res.data);
 

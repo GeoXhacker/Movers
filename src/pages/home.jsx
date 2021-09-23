@@ -20,6 +20,7 @@ import PackagePopup from "../components/package_popup";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { Swiper, SwiperSlide } from "swiper/react";
+import config from "../config";
 // import "swiper/css";
 
 // import "./map.css";
@@ -32,8 +33,7 @@ import { selectMAPTOKEN, selectToken } from "../js/store_redux";
 // var MapboxDirections = require("@mapbox/mapbox-gl-directions");
 // import { MapboxDirections } from "@mapbox/mapbox-gl-directions";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
+mapboxgl.accessToken = config.MAP_TOKEN;
 
 const params = {
   spaceBetween: 30,
@@ -70,7 +70,7 @@ const HomePage = ({ f7router }) => {
 
   const getBanners = () => {
     f7.request({
-      url: `${process.env.MOVERS_HOST}/api/v1/browse/attachments?role=banner`,
+      url: `${config.MAP_TOKEN}/api/v1/browse/attachments?role=banner`,
       method: "GET",
       headers: {
         "X-Access-Token": token,
@@ -114,7 +114,7 @@ const HomePage = ({ f7router }) => {
     f7.dialog.alert("Thank you for using Movers");
     f7router.refreshPage();
   }
-  console.log(process.env.MAP_TOKEN);
+  // console.log(process.env.MAP_TOKEN);
 
   const banners = ["banner1.jpg", "banner2.jpg", "banner3.jpeg"];
 

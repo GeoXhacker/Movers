@@ -23,6 +23,7 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import ReactMapboxAutocomplete from "../pages/autocomplete";
 import DestinationAutoComplete from "../pages/destinationAutoCom";
+import config from "../config";
 
 export default function deliveryPopUp({ children }) {
   const [popupOpened, setPopupOpened] = useState(false);
@@ -47,7 +48,7 @@ export default function deliveryPopUp({ children }) {
   const geocoderC = useRef(null);
 
   // mapboxgl.accessToken = MAP_TOKEN;
-  mapboxgl.accessToken = process.env.MAP_TOKEN;
+  mapboxgl.accessToken = config.MAP_TOKEN;
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -139,7 +140,7 @@ export default function deliveryPopUp({ children }) {
     f7.dialog.preloader("Processing order");
 
     f7.request({
-      url: `${f7.store.state.API_URL}/delivery`,
+      url: `${config.API_URL}/client/v1/delivery`,
       method: "POST",
       data: order,
       dataType: "json",
@@ -220,7 +221,7 @@ export default function deliveryPopUp({ children }) {
               resetSearch={false}
               country="ug"
               // apiToken={MAP_TOKEN}
-              apiToken={process.env.MAP_TOKEN}
+              apiToken={config.MAP_TOKEN}
               label="Shifting from"
               type="text"
               placeholder="Name of place"
@@ -235,7 +236,7 @@ export default function deliveryPopUp({ children }) {
               resetSearch={false}
               country="ug"
               // apiToken={MAP_TOKEN}
-              apiToken={process.env.MAP_TOKEN}
+              apiToken={config.MAP_TOKEN}
               label="To"
               type="text"
               placeholder="shifting to?"

@@ -24,6 +24,7 @@ import MapboxAutocomplete from "react-mapbox-autocomplete";
 // var MapboxDirections = require("@mapbox/mapbox-gl-directions");
 import ReactMapboxAutocomplete from "../pages/autocomplete";
 import DestinationAutoComplete from "../pages/destinationAutoCom";
+import config from "../config";
 
 // mapboxgl.accessToken =
 // "pk.eyJ1IjoibW92ZXJzIiwiYSI6ImNrdDVnbXp5ZDA4NmcycXFzMWtuamxuODQifQ.DlegQcTzXkX0yGEIO45vDQ";
@@ -103,7 +104,7 @@ export default function movePopUp({ children }) {
 
     f7.request({
       // url: `${f7.store.state.API_URL}/orders`,
-      url: `${API_URL}/orders`,
+      url: `${config.API_URL}/client/v1/orders`,
       method: "POST",
       data: order,
       dataType: "json",
@@ -225,7 +226,7 @@ export default function movePopUp({ children }) {
               resetSearch={false}
               country="ug"
               // apiToken={MAP_TOKEN}
-              apiToken={process.env.MAP_TOKEN}
+              apiToken={config.MAP_TOKEN}
               label="Shifting from"
               type="text"
               placeholder="Name of place"
@@ -258,7 +259,7 @@ export default function movePopUp({ children }) {
               resetSearch={false}
               country="ug"
               // apiToken={MAP_TOKEN}
-              apiToken={process.env.MAP_TOKEN}
+              apiToken={config.MAP_TOKEN}
               label="To"
               type="text"
               placeholder="shifting to?"
