@@ -14,7 +14,7 @@ module.exports = {
       ref: "origin/main",
       repo: "git@github.com:GeoXhacker/Movers.git",
       path: "/home/mukisa/movers-client",
-      "post-deploy": "pm2 serve www 8082--spa",
+      "post-deploy": "pm2 serve www 8082 --spa",
       // 'pre-deploy-local': '',
       // 'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       // 'pre-setup': ''
