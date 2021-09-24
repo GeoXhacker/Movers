@@ -3,7 +3,7 @@ module.exports = {
   env: {
     NODE_ENV: "production",
     PM2_SERVE_PATH: "www/",
-    PM2_SERVE_PORT: 8080,
+    PM2_SERVE_PORT: 8082,
     PM2_SERVE_SPA: "true",
   },
 
@@ -14,7 +14,7 @@ module.exports = {
       ref: "origin/main",
       repo: "git@github.com:GeoXhacker/Movers.git",
       path: "/home/mukisa/movers-client",
-      "post-deploy": "npm install && npm run build && pm2 serve www 8082 --spa",
+      "post-deploy": "pm2 serve www --spa",
       // 'pre-deploy-local': '',
       // 'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       // 'pre-setup': ''
